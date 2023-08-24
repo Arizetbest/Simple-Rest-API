@@ -15,7 +15,7 @@ records["999991235"] = "status : Slightly Cold"
 app.get("/records", (req, res) =>{
 
 
-    //Verify  Exists.
+    //Verify patient Exists.
     if(records[req.headers.ssn] === undefined ) {
         res.status(404).send({"msg": "Patient not found"})
         return;
@@ -73,12 +73,41 @@ app.put("/", (req, res) => {
         return;
     }
 
+    //Return appropriate record
     res.status(200).send({"msg":"HTTP PUT - SUCCESS"})
 
 });
 
 //Delete patient records
 app.delete("/", (req, res) =>{
-    res.status(200).send({"msg": "HTTP DELET - SUCCESS"})
-})
+
+
+
+//Verify patient Exists.
+if(records[req.headers.ssn] === undefined ) {
+    res.status(404).send({"msg": "Patient not found"})
+    return;
+}
+
+
+//Verify SSN matches FirstName and LastName.
+if (req.headers.firstname == [req.headers.ssn][0] && req.headers.lastname == [req.headers.ssn][1]){
+// Delete patient and medical record from database
+
+delete patients[req.headers.ssn]
+delete records[req.headers.ssn]
+
+res.status(200).send({"msg": "successfully deleted"});
+return;
+
+}
+else{
+    res.status(401).send({"msg": "Firstname or Lastname and SSN didnt match"})
+    return;
+}
+
+
+   
+});
+
 app.listen(3000);
